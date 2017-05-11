@@ -24,9 +24,9 @@ public class FeedDao {
             preparedStatement.setString(2, description);
 
             preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-            while (resultSet.next()) {
-                return resultSet.getLong(1);
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getLong(1);
             }
         } catch (MySQLIntegrityConstraintViolationException e) {
             throw new RuntimeException("Entry already exists");

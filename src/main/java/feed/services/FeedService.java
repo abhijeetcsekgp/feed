@@ -1,5 +1,6 @@
 package feed.services;
 
+import feed.daos.ArticleDao;
 import feed.daos.FeedDao;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -18,15 +19,8 @@ public class FeedService {
     @Inject
     private FeedDao feedDao;
 
-    @GET
-    @Produces({MediaType.APPLICATION_JSON})
-    public Response sayHello() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("msg", "Hello");
-        return Response.status(Response.Status.OK)
-                .entity(jsonObject.toJSONString())
-                .build();
-    }
+    @Inject
+    private ArticleDao articleDao;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -53,6 +47,11 @@ public class FeedService {
         JSONObject jsonObject = (JSONObject) jsonParser.parse(payload);
         String title = (String) jsonObject.get("title");
         String url = (String) jsonObject.get("url");
-        return Response.noContent().build();
+        Long articleId = articleDao.createArticle(feedId, title, url);
+        JSONObject response = new JSONObject();
+        response.put("id", articleId);
+        return Response.status(Response.Status.OK)
+                .entity(response.toJSONString())
+                .build();
     }
 }
