@@ -1,6 +1,7 @@
 package feed.daos;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import feed.entities.Article;
 import feed.entities.Feed;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +15,12 @@ public class UserDao {
     private static final String CREATE_USER_QUERY = "INSERT INTO _user(email_id) values(?)";
     private static final String READ_USER_QUERY = "SELECT id from _user where email_id = ?";
     private static final String SUBSCRIBE_USER_QUERY = "INSERT INTO subscription(user_id, feed_id) values(?, ?)";
-    private static final String READ_SUBSCRIPTION_QUERY = "SELECT f.name from _user u, subscription s, feed f " +
+    private static final String READ_SUBSCRIPTION_QUERY = "SELECT f.id, f.name, f.description " +
+            "from _user u, subscription s, feed f " +
             "where u.email_id = ? and u.id = s.user_id and s.feed_id = f.id";
+    private static final String READ_SUBSCRIBED_ARTICLES_QUERY = "select a.id, a.title, a.url from " +
+            "_user u, subscription s, feed_article fa, article a " +
+            "where u.email_id = ? and u.id = s.user_id and s.feed_id = fa.feed_id and fa.article_id = a.id";
 
     @Inject
     private ComboPooledDataSource dataSource;
@@ -90,7 +95,7 @@ public class UserDao {
         }
     }
 
-    public List<String> getSubscribedFeeds(String emailId) {
+    public List<Feed> getSubscribedFeeds(String emailId) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -99,13 +104,66 @@ public class UserDao {
 
             preparedStatement.setString(1, emailId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            List<String> feedList = new ArrayList<>();
+            List<Feed> feedList = new ArrayList<>();
             while (resultSet.next()) {
-                feedList.add(resultSet.getString(1));
+                Feed feed = new Feed(resultSet.getLong(1), resultSet.getString(2), resultSet.getString(3));
+                feedList.add(feed);
             }
             return feedList;
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    // do nothing
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    // do nothing
+                }
+            }
+        }
+    }
+
+    public List<Article> getSubscribedArticles(String emailId) {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = dataSource.getConnection();
+            preparedStatement = connection.prepareStatement(READ_SUBSCRIBED_ARTICLES_QUERY);
+
+            preparedStatement.setString(1, emailId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Article> articleList = new ArrayList<>();
+            while (resultSet.next()) {
+                Article article = new Article(resultSet.getLong(1), resultSet.getString(2), resultSet.getString(3));
+                articleList.add(article);
+            }
+            return articleList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    // do nothing
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    // do nothing
+                }
+            }
         }
     }
 }

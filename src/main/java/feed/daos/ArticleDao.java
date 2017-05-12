@@ -1,6 +1,7 @@
 package feed.daos;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import feed.entities.Article;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -14,7 +15,7 @@ public class ArticleDao {
     @Inject
     private ComboPooledDataSource dataSource;
 
-    public Long createArticle(long feedId, String title, String url) {
+    public Article createArticle(long feedId, String title, String url) {
         Connection connection = null;
         PreparedStatement createArticleStmt = null;
         PreparedStatement addArticleStmt = null;
@@ -40,7 +41,7 @@ public class ArticleDao {
 
             connection.commit();
 
-            return articleId;
+            return new Article(articleId, title, url);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {

@@ -1,8 +1,9 @@
 package feed.services;
 
+import com.google.gson.GsonBuilder;
 import feed.daos.UserDao;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import feed.entities.Article;
+import feed.entities.Feed;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -31,15 +32,10 @@ public class UserService {
     @Path("/{emailId}/subscription")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getSubscription(@PathParam("emailId") String emailId) {
-        List<String> subscribedFeeds = userDao.getSubscribedFeeds(emailId);
-        JSONArray jsonArray = new JSONArray();
-        for (String feed : subscribedFeeds) {
-            jsonArray.add(feed);
-        }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("subscription", jsonArray);
+        List<Feed> subscribedFeeds = userDao.getSubscribedFeeds(emailId);
+        String response = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(subscribedFeeds);
         return Response.status(Response.Status.OK)
-                .entity(jsonObject.toJSONString())
+                .entity(response)
                 .build();
     }
 
@@ -47,10 +43,10 @@ public class UserService {
     @Path("/{emailId}/articles")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getArticles(@PathParam("emailId") String emailId) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("msg", "Hello");
+        List<Article> articles = userDao.getSubscribedArticles(emailId);
+        String response = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(articles);
         return Response.status(Response.Status.OK)
-                .entity(jsonObject.toJSONString())
+                .entity(response)
                 .build();
     }
 }

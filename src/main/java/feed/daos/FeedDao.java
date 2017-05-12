@@ -2,6 +2,7 @@ package feed.daos;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import feed.entities.Feed;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -14,7 +15,7 @@ public class FeedDao {
     @Inject
     private ComboPooledDataSource dataSource;
 
-    public Long createFeed(String feedName, String description) {
+    public Feed createFeed(String feedName, String description) {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
         try {
@@ -26,7 +27,7 @@ public class FeedDao {
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
-                return generatedKeys.getLong(1);
+                return new Feed(generatedKeys.getLong(1), feedName, description);
             }
         } catch (MySQLIntegrityConstraintViolationException e) {
             throw new RuntimeException("Entry already exists");

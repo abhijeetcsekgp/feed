@@ -7,7 +7,6 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 public class ApplicationResourceConfig extends ResourceConfig {
 
     public ApplicationResourceConfig() {
-        register(RolesAllowedDynamicFeature.class);
         register(MultiPartFeature.class);
         packages("feed");
     }

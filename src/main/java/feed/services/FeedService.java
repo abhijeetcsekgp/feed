@@ -1,7 +1,10 @@
 package feed.services;
 
+import com.google.gson.Gson;
 import feed.daos.ArticleDao;
 import feed.daos.FeedDao;
+import feed.entities.Article;
+import feed.entities.Feed;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -30,11 +33,10 @@ public class FeedService {
         JSONObject jsonObject = (JSONObject) jsonParser.parse(payload);
         String name = (String) jsonObject.get("name");
         String description = (String) jsonObject.get("description");
-        Long id = feedDao.createFeed(name, description);
-        JSONObject response = new JSONObject();
-        response.put("id", id);
+        Feed feed = feedDao.createFeed(name, description);
+        String response = new Gson().toJson(feed);
         return Response.status(Response.Status.OK)
-                .entity(response.toJSONString())
+                .entity(response)
                 .build();
     }
 
@@ -47,11 +49,10 @@ public class FeedService {
         JSONObject jsonObject = (JSONObject) jsonParser.parse(payload);
         String title = (String) jsonObject.get("title");
         String url = (String) jsonObject.get("url");
-        Long articleId = articleDao.createArticle(feedId, title, url);
-        JSONObject response = new JSONObject();
-        response.put("id", articleId);
+        Article article = articleDao.createArticle(feedId, title, url);
+        String response = new Gson().toJson(article);
         return Response.status(Response.Status.OK)
-                .entity(response.toJSONString())
+                .entity(response)
                 .build();
     }
 }
