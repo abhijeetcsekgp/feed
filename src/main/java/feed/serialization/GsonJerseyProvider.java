@@ -17,6 +17,11 @@ import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+
+/**
+ * Converts json payload received in API call to java equivalent objects, i.e. ArticleRequest, FeedRequest.
+ * Also, converts the java objects back to json while sending back response.
+ */
 @Provider
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)

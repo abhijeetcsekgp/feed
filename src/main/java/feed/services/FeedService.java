@@ -6,7 +6,6 @@ import feed.entities.Article;
 import feed.entities.Feed;
 import feed.entities.request.ArticleRequest;
 import feed.entities.request.FeedRequest;
-import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -27,7 +26,7 @@ public class FeedService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createFeed(FeedRequest feedRequest) throws ParseException {
+    public Response createFeed(FeedRequest feedRequest) {
         Feed feed = feedDao.createFeed(feedRequest.getName(), feedRequest.getDescription());
         return Response.status(Response.Status.OK)
                 .entity(feed)
@@ -38,7 +37,7 @@ public class FeedService {
     @Path("/{feedId}/add-article")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addArticle(@PathParam("feedId") long feedId, ArticleRequest articleRequest) throws ParseException {
+    public Response addArticle(@PathParam("feedId") long feedId, ArticleRequest articleRequest) {
         Article article = articleDao.createArticle(feedId, articleRequest.getTitle(), articleRequest.getUrl());
         return Response.status(Response.Status.OK)
                 .entity(article)

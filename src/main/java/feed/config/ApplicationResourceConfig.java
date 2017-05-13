@@ -1,13 +1,11 @@
 package feed.config;
 
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 public class ApplicationResourceConfig extends ResourceConfig {
 
     public ApplicationResourceConfig() {
-        register(MultiPartFeature.class);
+        //registers resources and providers using package scanning
         packages("feed");
     }
 }

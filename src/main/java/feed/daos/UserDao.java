@@ -35,9 +35,11 @@ public class UserDao {
         PreparedStatement subscribeUserStmt = null;
         try {
             connection = dataSource.getConnection();
+            //create user(if doesn't exist) and subscribe in a single transaction
             connection.setAutoCommit(false);
 
             long userId;
+            //check if the user already exists
             readUserStmt = connection.prepareStatement(READ_USER_QUERY);
             readUserStmt.setString(1, emailId);
 
@@ -63,7 +65,7 @@ public class UserDao {
 
             connection.commit();
         } catch (SQLIntegrityConstraintViolationException e) {
-            throw new AppException(Status.FORBIDDEN.getStatusCode(), "Already subscribed to feed");
+            throw new AppException(Status.FORBIDDEN.getStatusCode(), "Already subscribed to feed or feed doesn't exist");
         } catch (SQLException e) {
             throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
         } finally {

@@ -24,6 +24,7 @@ public class ArticleDao {
         PreparedStatement addArticleStmt = null;
         try {
             connection = dataSource.getConnection();
+            //create article and add to feed in a transaction
             connection.setAutoCommit(false);
 
             createArticleStmt = connection.prepareStatement(CREATE_ARTICLE_QUERY, Statement.RETURN_GENERATED_KEYS);
@@ -34,6 +35,7 @@ public class ArticleDao {
             ResultSet resultSet = createArticleStmt.getGeneratedKeys();
             long articleId;
             if (resultSet.next()) {
+                //retrieve the generated id for the created article
                 articleId = resultSet.getLong(1);
             } else {
                 throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
@@ -47,6 +49,8 @@ public class ArticleDao {
             connection.commit();
 
             return new Article(articleId, title, url);
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new AppException(Status.BAD_REQUEST.getStatusCode(), "Feed doesn't exist");
         } catch (SQLException e) {
             throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
         } finally {
