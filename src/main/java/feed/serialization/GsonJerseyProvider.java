@@ -1,4 +1,4 @@
-package feed.services;
+package feed.serialization;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
