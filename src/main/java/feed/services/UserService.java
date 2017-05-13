@@ -1,6 +1,5 @@
 package feed.services;
 
-import com.google.gson.GsonBuilder;
 import feed.daos.UserDao;
 import feed.entities.Article;
 import feed.entities.Feed;
@@ -14,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-import static javax.ws.rs.core.Response.*;
+import static javax.ws.rs.core.Response.Status;
 
 @Path("/users")
 @Service

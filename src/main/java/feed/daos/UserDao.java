@@ -148,7 +148,10 @@ public class UserDao {
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Article> articleList = new ArrayList<>();
             while (resultSet.next()) {
-                Article article = new Article(resultSet.getLong(1), resultSet.getString(2), resultSet.getString(3));
+                long id = resultSet.getLong(1);
+                String title = resultSet.getString(2);
+                String url = resultSet.getString(3);
+                Article article = new Article(id, title, url);
                 articleList.add(article);
             }
             return articleList;

@@ -1,6 +1,5 @@
 package feed.services;
 
-import com.google.gson.Gson;
 import feed.daos.ArticleDao;
 import feed.daos.FeedDao;
 import feed.entities.Article;
