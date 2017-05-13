@@ -45,8 +45,10 @@ public class UserDao {
 
             ResultSet resultSet = readUserStmt.executeQuery();
             if (resultSet.next()) {
+                //user already exists
                 userId = resultSet.getLong(1);
             } else {
+                //user doesn't exist, create a new user and subscribe the created user to the feed
                 createUserStmt = connection.prepareStatement(CREATE_USER_QUERY, Statement.RETURN_GENERATED_KEYS);
                 createUserStmt.setString(1, emailId);
                 createUserStmt.executeUpdate();
