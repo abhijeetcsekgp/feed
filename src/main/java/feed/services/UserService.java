@@ -39,9 +39,8 @@ public class UserService {
     public Response getSubscription(@PathParam("emailId") String emailId) {
         validateEmailAddress(emailId);
         List<Feed> subscribedFeeds = userDao.getSubscribedFeeds(emailId);
-        String response = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(subscribedFeeds);
         return Response.status(Response.Status.OK)
-                .entity(response)
+                .entity(subscribedFeeds)
                 .build();
     }
 
@@ -51,9 +50,8 @@ public class UserService {
     public Response getArticles(@PathParam("emailId") String emailId) {
         validateEmailAddress(emailId);
         List<Article> articles = userDao.getSubscribedArticles(emailId);
-        String response = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create().toJson(articles);
         return Response.status(Response.Status.OK)
-                .entity(response)
+                .entity(articles)
                 .build();
     }
 

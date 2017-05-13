@@ -62,6 +62,8 @@ public class UserDao {
             subscribeUserStmt.execute();
 
             connection.commit();
+        } catch (SQLIntegrityConstraintViolationException e) {
+            throw new AppException(Status.FORBIDDEN.getStatusCode(), "Already subscribed to feed");
         } catch (SQLException e) {
             throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
         } finally {

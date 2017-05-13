@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class Article {
-    @Expose(serialize = false)
+    @Expose
     private final long id;
     @Expose
     private final String title;

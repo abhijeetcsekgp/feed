@@ -5,8 +5,8 @@ import feed.daos.ArticleDao;
 import feed.daos.FeedDao;
 import feed.entities.Article;
 import feed.entities.Feed;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import feed.entities.request.ArticleRequest;
+import feed.entities.request.FeedRequest;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 
@@ -28,15 +28,10 @@ public class FeedService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createFeed(String payload) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(payload);
-        String name = (String) jsonObject.get("name");
-        String description = (String) jsonObject.get("description");
-        Feed feed = feedDao.createFeed(name, description);
-        String response = new Gson().toJson(feed);
+    public Response createFeed(FeedRequest feedRequest) throws ParseException {
+        Feed feed = feedDao.createFeed(feedRequest.getName(), feedRequest.getDescription());
         return Response.status(Response.Status.OK)
-                .entity(response)
+                .entity(feed)
                 .build();
     }
 
@@ -44,15 +39,10 @@ public class FeedService {
     @Path("/{feedId}/add-article")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addArticle(@PathParam("feedId") long feedId, String payload) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(payload);
-        String title = (String) jsonObject.get("title");
-        String url = (String) jsonObject.get("url");
-        Article article = articleDao.createArticle(feedId, title, url);
-        String response = new Gson().toJson(article);
+    public Response addArticle(@PathParam("feedId") long feedId, ArticleRequest articleRequest) throws ParseException {
+        Article article = articleDao.createArticle(feedId, articleRequest.getTitle(), articleRequest.getUrl());
         return Response.status(Response.Status.OK)
-                .entity(response)
+                .entity(article)
                 .build();
     }
 }
