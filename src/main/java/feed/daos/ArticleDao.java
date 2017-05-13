@@ -1,11 +1,14 @@
 package feed.daos;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import feed.entities.Article;
+import feed.exception.AppException;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import javax.sql.DataSource;
 import java.sql.*;
+
+import static javax.ws.rs.core.Response.Status;
 
 @Component
 public class ArticleDao {
@@ -13,7 +16,7 @@ public class ArticleDao {
     private static final String ADD_ARTICLE_TO_FEED_QUERY = "INSERT INTO feed_article(feed_id, article_id) VALUES(?, ?)";
 
     @Inject
-    private ComboPooledDataSource dataSource;
+    private DataSource dataSource;
 
     public Article createArticle(long feedId, String title, String url) {
         Connection connection = null;
@@ -29,9 +32,11 @@ public class ArticleDao {
 
             createArticleStmt.executeUpdate();
             ResultSet resultSet = createArticleStmt.getGeneratedKeys();
-            long articleId = -1L;
-            while (resultSet.next()) {
+            long articleId;
+            if (resultSet.next()) {
                 articleId = resultSet.getLong(1);
+            } else {
+                throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
             }
 
             addArticleStmt = connection.prepareStatement(ADD_ARTICLE_TO_FEED_QUERY);
@@ -43,7 +48,7 @@ public class ArticleDao {
 
             return new Article(articleId, title, url);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
         } finally {
             if (createArticleStmt != null) {
                 try {

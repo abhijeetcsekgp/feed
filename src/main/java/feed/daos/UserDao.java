@@ -1,14 +1,17 @@
 package feed.daos;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import feed.entities.Article;
 import feed.entities.Feed;
+import feed.exception.AppException;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static javax.ws.rs.core.Response.Status;
 
 @Component
 public class UserDao {
@@ -23,7 +26,7 @@ public class UserDao {
             "where u.email_id = ? and u.id = s.user_id and s.feed_id = fa.feed_id and fa.article_id = a.id";
 
     @Inject
-    private ComboPooledDataSource dataSource;
+    private DataSource dataSource;
 
     public void subscribeUser(long feedId, String emailId) {
         Connection connection = null;
@@ -34,8 +37,7 @@ public class UserDao {
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
 
-            long userId = -1L;
-
+            long userId;
             readUserStmt = connection.prepareStatement(READ_USER_QUERY);
             readUserStmt.setString(1, emailId);
 
@@ -49,6 +51,8 @@ public class UserDao {
                 ResultSet generatedKeys = createUserStmt.getGeneratedKeys();
                 if (generatedKeys.next()) {
                     userId = generatedKeys.getLong(1);
+                } else {
+                    throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
                 }
             }
 
@@ -59,7 +63,7 @@ public class UserDao {
 
             connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
         } finally {
             if (readUserStmt != null) {
                 try {
@@ -111,7 +115,7 @@ public class UserDao {
             }
             return feedList;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
         } finally {
             if (preparedStatement != null) {
                 try {
@@ -147,7 +151,7 @@ public class UserDao {
             }
             return articleList;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
         } finally {
             if (preparedStatement != null) {
                 try {
