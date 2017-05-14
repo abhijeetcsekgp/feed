@@ -1,4 +1,4 @@
-# feed-reader
+# feed
 This project supports a simple feed service. The service supports the following operations.
 - Create a feed
 - Add article to a feed
