@@ -24,11 +24,19 @@ public class UserService {
 
     @POST
     @Path("/{emailId}/subscribe/{feedId}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response subscribe(@PathParam("emailId") String emailId, @PathParam("feedId") long feedId) {
         validateEmailAddress(emailId);
         userDao.subscribeUser(feedId, emailId);
+        return Response.noContent().build();
+    }
+
+    @DELETE
+    @Path("/{emailId}/unsubscribe/{feedId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response unsubscribe(@PathParam("emailId") String emailId, @PathParam("feedId") long feedId) {
+        validateEmailAddress(emailId);
+        userDao.unsubscribeUser(feedId, emailId);
         return Response.noContent().build();
     }
 

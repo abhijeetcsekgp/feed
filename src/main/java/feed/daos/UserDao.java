@@ -18,6 +18,7 @@ public class UserDao {
     private static final String CREATE_USER_QUERY = "INSERT INTO _user(email_id) values(?)";
     private static final String READ_USER_QUERY = "SELECT id from _user where email_id = ?";
     private static final String SUBSCRIBE_USER_QUERY = "INSERT INTO subscription(user_id, feed_id) values(?, ?)";
+    private static final String UNSUBSCRIBE_USER_QUERY = "DELETE from subscription where user_id = ? and feed_id = ?";
     private static final String READ_SUBSCRIPTION_QUERY = "SELECT f.id, f.name, f.description " +
             "from _user u, subscription s, feed f " +
             "where u.email_id = ? and u.id = s.user_id and s.feed_id = f.id";
@@ -100,6 +101,58 @@ public class UserDao {
                     connection.close();
                 } catch (SQLException e) {
                     // do nothing
+                }
+            }
+        }
+    }
+
+    public void unsubscribeUser(long feedId, String emailId) {
+        Connection connection = null;
+        PreparedStatement readUserStmt = null;
+        PreparedStatement unsubscribeUserStmt = null;
+        try {
+            connection = dataSource.getConnection();
+
+            //check if the user exists
+            readUserStmt = connection.prepareStatement(READ_USER_QUERY);
+            readUserStmt.setString(1, emailId);
+
+            ResultSet resultSet = readUserStmt.executeQuery();
+            if (resultSet.next()) {
+                //user exists
+                long userId = resultSet.getLong(1);
+                unsubscribeUserStmt = connection.prepareStatement(UNSUBSCRIBE_USER_QUERY);
+                unsubscribeUserStmt.setLong(1, userId);
+                unsubscribeUserStmt.setLong(2, feedId);
+                unsubscribeUserStmt.execute();
+            } else {
+                //user doesn't exist
+                throw new AppException(Status.BAD_REQUEST.getStatusCode(), "User doesn't exist");
+            }
+        } catch (SQLException e) {
+            throw new AppException(Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Unknown error");
+        } finally {
+            if (readUserStmt != null) {
+                try {
+                    readUserStmt.close();
+                } catch (SQLException e) {
+                    //do nothing
+                }
+            }
+
+            if (unsubscribeUserStmt != null) {
+                try {
+                    unsubscribeUserStmt.close();
+                } catch (SQLException e) {
+                    //do nothing
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    //do nothing
                 }
             }
         }
